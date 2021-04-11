@@ -2,9 +2,8 @@
 
 DetailTreeView::DetailTreeView()
 {
-
 }
-QStandardItemModel* DetailTreeView::detailModel = new QStandardItemModel;
+QStandardItemModel *DetailTreeView::detailModel = new QStandardItemModel;
 
 void DetailTreeView::Setup()
 {
@@ -21,25 +20,25 @@ void DetailTreeView::ShowTreeAnalyseInfo(const SnifferData *snifferData)
     item = new QStandardItem(snifferData->protoInfo.strEthTitle);
     detailModel->setItem(0, item);
 
-	item->appendRow( new QStandardItem(snifferData->protoInfo.strDMac));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strSMac));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strType));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strDMac));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strSMac));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strType));
 
     item = new QStandardItem(snifferData->protoInfo.strIPTitle);
     detailModel->setItem(1, item);
 
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strVersion));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strHeadLength));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strLength));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strNextProto));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strVersion));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strHeadLength));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strLength));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strNextProto));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
 
     item = new QStandardItem(snifferData->protoInfo.strTranProto);
-    detailModel->setItem(2,  item);
+    detailModel->setItem(2, item);
 
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strSPort));
-	item->appendRow(new QStandardItem(snifferData->protoInfo.strDPort));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strSPort));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strDPort));
 
     item = new QStandardItem(snifferData->protoInfo.strAppProto);
     detailModel->setItem(3, item);

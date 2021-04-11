@@ -10,8 +10,6 @@ public:
     static void addPacketItem(SnifferData item);
     void setListHeader();
     static QStandardItemModel *PacketModel;
-// private:
-
 };
 
 #endif // PACKETSLISTVIEW_H

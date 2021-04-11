@@ -180,7 +180,6 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
 
     Global::packets.push_back(tmpSnifferData);
     PacketsListView::addPacketItem(tmpSnifferData);
-    //test
 }
 
 void processIPPacket(const unsigned char *data)

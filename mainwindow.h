@@ -10,7 +10,10 @@
 #include "detailtreeview.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui
+{
+    class MainWindow;
+}
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -26,7 +29,6 @@ public slots:
     void startCapture();
     void stop();
     void addDataToWidget(const QItemSelection &nowSelect);
-
 
 private:
     Ui::MainWindow *ui;

@@ -44,8 +44,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->packetTableView->setModel(PacketsListView::PacketModel);
 
     ui->detailTreeView->setModel(DetailTreeView::detailModel);
-    QObject::connect(ui->packetTableView->selectionModel(),SIGNAL(selectionChanged(QItemSelection , QItemSelection )),this,SLOT(addDataToWidget(const QItemSelection &)));
-//    connect(ui->detailTreeView,SIGNAL(clicked()),this,SLOT(addDataToWidget(const QItemSelection &)));
+    QObject::connect(ui->packetTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(addDataToWidget(const QItemSelection &)));
+    //    connect(ui->detailTreeView,SIGNAL(clicked()),this,SLOT(addDataToWidget(const QItemSelection &)));
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startCapture()));
     connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stop()));
 }
@@ -59,8 +59,6 @@ void MainWindow::Helloworld()
 {
     QMessageBox::warning(0, "hello", "hello");
 }
-
-
 
 void MainWindow::startCapture()
 {
@@ -82,8 +80,6 @@ void MainWindow::startCapture()
 
     ui->startButton->setDisabled(true);
     ui->stopButton->setDisabled(false);
-
-
 }
 
 void MainWindow::stop()
@@ -93,21 +89,17 @@ void MainWindow::stop()
     capture.stop();
 }
 
-
-
 void MainWindow::addDataToWidget(const QItemSelection &nowSelect)
 {
     QModelIndexList items = nowSelect.indexes();
-    QModelIndex 	index = items.first();
-
-
+    QModelIndex index = items.first();
 
     int iNumber = index.row();
 
-    if ((unsigned int)iNumber < Global::packets.size()) {
+    if ((unsigned int)iNumber < Global::packets.size())
+    {
         DetailTreeView::ShowTreeAnalyseInfo(&(Global::packets.at(iNumber)));
-//        explainEdit->setText(sniffer->snifferDataVector.at(iNumber).protoInfo.strSendInfo);
-//        originalEdit->setText(sniffer->snifferDataVector.at(iNumber-1).strData);
+        //        explainEdit->setText(sniffer->snifferDataVector.at(iNumber).protoInfo.strSendInfo);
+        //        originalEdit->setText(sniffer->snifferDataVector.at(iNumber-1).strData);
     }
 }
-

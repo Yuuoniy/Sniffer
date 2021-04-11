@@ -4,12 +4,11 @@
 #include "protocol.h"
 #include "global.h"
 
-void processPacket(const struct pcap_pkthdr *header,const unsigned char *data);
-void processIPPacket(const unsigned char  * buffer);
+void processPacket(const struct pcap_pkthdr *header, const unsigned char *data);
+void processIPPacket(const unsigned char *buffer);
 void processARPPacket(const unsigned char *buffer);
 
 void processICMPPacket(const unsigned char *);
-
 
 void processIGMPPacket(const unsigned char *);
 
