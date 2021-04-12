@@ -136,5 +136,89 @@ void DetailTreeView::addAppInfo(const SnifferData *snifferData)
         return;
     QStandardItem *item, *itemChild;
     item = new QStandardItem(snifferData->protoInfo.strAppProto);
+
     detailModel->setItem(application_layer, item);
+    if (snifferData->protoInfo.strAppProto.indexOf("HTTP") != -1)
+    {
+        addHTTPInfo(item, snifferData);
+    }
+}
+
+QString escape(QString origin)
+{
+    QString replaced(origin);
+    replaced.replace(QString("\r"), QString("\\r"));
+    replaced.replace(QString("\n"), QString("\\n"));
+    return replaced;
+}
+
+void DetailTreeView::addHTTPInfo(QStandardItem *item, const SnifferData *snifferData)
+{
+
+    QRegularExpression httpGetMethodReg("GET .+\r\n");
+
+    QRegularExpression httpHostReg("Host: .+\r\n");
+
+    QRegularExpression httpConnectionReg("Connection: .+\r\n");
+
+    QRegularExpression httpCacheControlReg("Cache-Control: .+\r\n");
+
+    QRegularExpression httpUserAgentReg("User-Agent: .+\r\n");
+
+    QRegularExpression httpAcceptReg("Accept: .+\r\n");
+
+    QRegularExpression httpResponseReg("HTTP/1.1 .+\r\n");
+
+    std::string http_txt = "";
+    int ip_len = ntohs(snifferData->protoInfo.IP_header->tlen);
+    for (int i = 0; i < ip_len; ++i)
+    {
+        if ((isalnum((snifferData->pkt_data + 14)[i]) || ispunct((snifferData->pkt_data + 14)[i]) ||
+             isspace((snifferData->pkt_data + 14)[i]) || isprint((snifferData->pkt_data + 14)[i])))
+        {
+            http_txt += (snifferData->pkt_data + 14)[i];
+        }
+    }
+    QString text = QString(http_txt.c_str());
+    QString httpMethod, httpHost, httpConnection, httpCacheControl, httpUserAgent, httpAccept, httpResponse;
+
+    if (httpGetMethodReg.match(text).hasMatch())
+        httpMethod = httpGetMethodReg.match(text).captured(0);
+    if (httpHostReg.match(text).hasMatch())
+        httpHost = httpHostReg.match(text).captured(0);
+    if (httpConnectionReg.match(text).hasMatch())
+        httpConnection = httpConnectionReg.match(text).captured(0);
+    if (httpCacheControlReg.match(text).hasMatch())
+        httpCacheControl = httpCacheControlReg.match(text).captured(0);
+    if (httpUserAgentReg.match(text).hasMatch())
+        httpUserAgent = httpUserAgentReg.match(text).captured(0);
+    if (httpAcceptReg.match(text).hasMatch())
+        httpAccept = httpAcceptReg.match(text).captured(0);
+    if (httpResponseReg.match(text).hasMatch())
+        httpResponse = httpResponseReg.match(text).captured(0);
+
+    httpMethod = escape(httpMethod);
+    httpHost = escape(httpHost);
+    httpConnection = escape(httpConnection);
+    httpCacheControl = escape(httpCacheControl);
+    httpUserAgent = escape(httpUserAgent);
+    httpAccept = escape(httpAccept);
+    httpResponse = escape(httpResponse);
+
+    QList<QStandardItem *> itemChild;
+    if (!httpMethod.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpMethod)));
+    if (!httpResponse.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpResponse)));
+    if (!httpHost.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpHost)));
+    if (!httpConnection.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpConnection)));
+    if (!httpUserAgent.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpUserAgent)));
+    if (!httpAccept.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpAccept)));
+    if (!httpCacheControl.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpCacheControl)));
+    item->appendRows(itemChild);
 }

@@ -2,6 +2,8 @@
 #define DETAILTREEVIEW_H
 
 #include <QStandardItemModel>
+#include <QString>
+#include <QRegularExpression>
 #include "protocol.h"
 
 class DetailTreeView
@@ -20,6 +22,7 @@ public:
     static void addAppInfo(const SnifferData *snifferData);
     static void addTCPInfo(QStandardItem *item, const SnifferData *snifferData);
     static void addUDPInfo(QStandardItem *item, const SnifferData *snifferData);
+    static void addHTTPInfo(QStandardItem *item, const SnifferData *snifferData);
     static QStandardItemModel *detailModel;
 };
 
