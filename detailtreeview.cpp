@@ -81,9 +81,13 @@ void DetailTreeView::addTransInfo(const SnifferData *snifferData)
     detailModel->setItem(trans_layer, item);
     item->appendRow(new QStandardItem(snifferData->protoInfo.strSPort));
     item->appendRow(new QStandardItem(snifferData->protoInfo.strDPort));
-    if (snifferData->protoInfo.strTranProto.indexOf("TCP")!=-1)
+    if (snifferData->protoInfo.strTranProto.indexOf("TCP") != -1)
     {
-        addTCPInfo(item,snifferData);
+        addTCPInfo(item, snifferData);
+    }
+    else if (snifferData->protoInfo.strTranProto.indexOf("UDP") != -1)
+    {
+        addUDPInfo(item, snifferData);
     }
 }
 
@@ -111,9 +115,21 @@ void DetailTreeView::addTCPInfo(QStandardItem *item, const SnifferData *snifferD
     childItems.push_back(new QStandardItem(QString("Header length: %1").arg(4 * data_offset.toInt())));
     childItems.push_back(new QStandardItem(QString("Flags: %1").arg(flags)));
     childItems.push_back(new QStandardItem(QString("Window size value: %1").arg(window_size)));
-//    childItems.push_back(new QStandardItem(QString("Urgent pointer: %1").arg(urgp)));
+    //    childItems.push_back(new QStandardItem(QString("Urgent pointer: %1").arg(urgp)));
     item->appendRows(childItems);
 }
+
+void DetailTreeView::addUDPInfo(QStandardItem *item, const SnifferData *snifferData)
+{
+    QString length = QString::number(ntohs(snifferData->protoInfo.UDP_header->len));
+    QString crc = QString::number(ntohs(snifferData->protoInfo.UDP_header->crc));
+
+    QList<QStandardItem *> childItems;
+    childItems.push_back(new QStandardItem(QString("Length: %1").arg(length)));
+    childItems.push_back(new QStandardItem(QString("Checksum: %1").arg(crc)));
+    item->appendRows(childItems);
+}
+
 void DetailTreeView::addAppInfo(const SnifferData *snifferData)
 {
     if (snifferData->protoInfo.strAppProto == "")

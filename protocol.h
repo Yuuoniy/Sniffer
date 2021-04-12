@@ -81,7 +81,7 @@ typedef struct ipv6hdr
 
 typedef struct tcphdr
 {
-    u_short sport; //源端口地址 16位
+    u_short sport; //src 16
     u_short dport; //目的端口地址 16位
     u_int seq;     //序列号 32位
     u_int ack; //确认序列号
@@ -97,7 +97,7 @@ typedef struct udphdr
     u_short sport;
     u_short dport;
     u_short len;
-    u_short check;
+    u_short crc;
 } udphdr;
 
 /* ICMP header */
