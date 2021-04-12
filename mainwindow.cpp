@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QComboBox>
 #include <QSplitter>
+#include <ctype.h>
 #include <pcap.h>
 #include "threads/captureThread.h"
 
@@ -42,12 +43,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->packetTableView->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
     ui->packetTableView->verticalHeader()->hide();
     ui->packetTableView->setModel(PacketsListView::PacketModel);
-
+    ui->packetTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->detailTreeView->setModel(DetailTreeView::detailModel);
     QObject::connect(ui->packetTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(addDataToWidget(const QItemSelection &)));
-    //    connect(ui->detailTreeView,SIGNAL(clicked()),this,SLOT(addDataToWidget(const QItemSelection &)));
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startCapture()));
     connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stop()));
+
+
+    ui->textEdit->setStyleSheet("QTextEdit {margin-left:0px; margin-right:0px}");
+    // ui->textEdit.setStyleSheet("QTextEdit {margin-left:0px; margin-right:0px}");
 }
 
 MainWindow::~MainWindow()
@@ -89,6 +93,47 @@ void MainWindow::stop()
     capture.stop();
 }
 
+
+QString generateHexOutputFromData(unsigned char * data,int len){
+
+    QString hexText = QString("");
+    char buf[6];
+    memset(buf,0,6);
+    for (int i = 1; i<len+1; i++)
+    {
+        sprintf(buf,"%.2x ", data[i-1]);
+
+
+        hexText += QString(buf);
+        if ((i % 16) == 0)
+            hexText += "\n";
+        memset(buf,0,6);
+    }
+    return hexText;
+
+}
+
+QString generateACSIIOutputFromData(unsigned char * data,int len){
+    QString asciiText = QString("");
+    char ch;
+    for (int i = 1; i<len+1; i++)
+    {
+        ch = data[i-1];
+        if(isprint(ch)){
+            asciiText+= ch;
+        }else{
+            asciiText+='.';
+        }
+       
+        if ((i % 16) == 0)
+            asciiText += "\n";
+    }
+    return asciiText;
+
+}
+
+
+
 void MainWindow::addDataToWidget(const QItemSelection &nowSelect)
 {
     QModelIndexList items = nowSelect.indexes();
@@ -99,7 +144,18 @@ void MainWindow::addDataToWidget(const QItemSelection &nowSelect)
     if ((unsigned int)iNumber < Global::packets.size())
     {
         DetailTreeView::ShowTreeAnalyseInfo(&(Global::packets.at(iNumber)));
+        QString output;
+        int len = Global::packets.at(iNumber).strLength.toInt();
+
+        output = generateHexOutputFromData(Global::packets.at(iNumber).pkt_data,len);
+        ui->textEdit->setText(output);
+
+        output = generateACSIIOutputFromData(Global::packets.at(iNumber).pkt_data,len);
+        ui->acsiiTextEdit->setText(output);
+        //        ui->textEdit->setText(getStringFromUnsignedChar(Global::packets.at(iNumber).pkt_data));
         //        explainEdit->setText(sniffer->snifferDataVector.at(iNumber).protoInfo.strSendInfo);
-        //        originalEdit->setText(sniffer->snifferDataVector.at(iNumber-1).strData);
+        //                originalEdit->setText(sniffer->snifferDataVector.at(iNumber-1).strData);
     }
 }
+
+

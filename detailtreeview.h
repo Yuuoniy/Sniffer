@@ -10,6 +10,7 @@ public:
     DetailTreeView();
     static void Setup();
     static void ShowTreeAnalyseInfo(const SnifferData *snifferData);
+//    static void ShowRawData()
     static QStandardItemModel *detailModel;
 };
 

@@ -178,6 +178,7 @@ struct SnifferData
     QString strProto;           // 使用的协议
     QString strLength;          // 数据长度
     QByteArray strData;         // 原始数据
+    unsigned char * pkt_data;
     AnalyseProtoType protoInfo; // 树形显示结果的数据结构
 };
 

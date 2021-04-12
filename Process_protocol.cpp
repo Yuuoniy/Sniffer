@@ -25,7 +25,8 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
     SnifferData tmpSnifferData;
 
     rawByteData.clear();
-    rawByteData.setRawData((const char *)data, header->caplen);
+    // rawByteData.setRawData((const char *)data, header->caplen);
+    rawByteData.setRawData((const char *)data, header->len);
 
     tmpSnifferData.protoInfo.init();
 
@@ -39,7 +40,7 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
     tmpSnifferData.strTime = timestr;
     sprintf(szLength, "%d", header->len);
     tmpSnifferData.strLength = szLength;
-
+    tmpSnifferData.pkt_data = (unsigned char*)data;
     ethhdr *eh;
     iphdr *ih;
     udphdr *uh;
