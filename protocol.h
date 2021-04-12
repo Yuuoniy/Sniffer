@@ -84,12 +84,11 @@ typedef struct tcphdr
     u_short sport; //源端口地址 16位
     u_short dport; //目的端口地址 16位
     u_int seq;     //序列号 32位
-    u_int ack_seq; //确认序列号
-    u_short res1 : 4, doff : 4, fin : 1, syn : 1, rst : 1, psh : 1, ack : 1, urg : 1,
-        ece : 1, cwr : 1; //标志位
-    u_short window;       //窗口大小 16位
-    u_short check;        //校验和 16位
-    u_short urg_ptr;      //紧急指针 16位
+    u_int ack; //确认序列号
+    u_short tcp_res; //TCP头长(4 bits)+保留位(6 bits)+Flags(URG+ACK+PSH+RST+SYN+FIN)
+    u_short windsize;       //窗口大小 16位
+    u_short crc;        //校验和 16位
+    u_short urgp;      //紧急指针 16位
     u_int opt;            //选项
 } tcphdr;
 

@@ -51,7 +51,11 @@
      </widget>
     </item>
     <item row="3" column="0" colspan="3">
-     <widget class="QTreeView" name="detailTreeView"/>
+     <widget class="QTreeView" name="detailTreeView">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+     </widget>
     </item>
     <item row="0" column="0">
      <widget class="QComboBox" name="comboBox">

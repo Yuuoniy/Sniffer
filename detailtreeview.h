@@ -18,7 +18,7 @@ public:
     static void addTransInfo(const SnifferData *snifferData);
 
     static void addAppInfo(const SnifferData *snifferData);
-
+    static void addTCPInfo(QStandardItem *item, const SnifferData *snifferData);
 
     static QStandardItemModel *detailModel;
 };
