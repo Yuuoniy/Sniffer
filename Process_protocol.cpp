@@ -101,7 +101,7 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
         dport = ntohs(th->dport);
         if (sport == FTP_PORT || dport == FTP_PORT)
         {
-            tmpSnifferData.strProto += " (FTP)";
+            tmpSnifferData.strProto = "FTP";
             tmpSnifferData.protoInfo.strAppProto += "FTP (File Transfer Protocol)";
         }
         else if (sport == TELNET_PORT || dport == TELNET_PORT)
@@ -121,20 +121,20 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
         }
         else if (sport == HTTPS_PORT || dport == HTTPS_PORT)
         {
-            tmpSnifferData.strProto += " (HTTPS)";
+            tmpSnifferData.strProto = "HTTPS";
             tmpSnifferData.protoInfo.strAppProto += "HTTPS (Hypertext Transfer "
                                                     "Protocol over Secure Socket Layer)";
         }
         else if (sport == HTTP_PORT || dport == HTTP_PORT ||
                  sport == HTTP2_PORT || dport == HTTP2_PORT)
         {
-            tmpSnifferData.strProto += " (HTTP)";
+            tmpSnifferData.strProto = "HTTP";
             tmpSnifferData.protoInfo.strAppProto += "HTTP (Hyper Text Transport Protocol)";
             tmpSnifferData.protoInfo.strSendInfo = rawByteData.remove(0, 54);
         }
         else
         {
-            tmpSnifferData.protoInfo.strAppProto += "Unknown Proto";
+            tmpSnifferData.protoInfo.strAppProto = "";
         }
         break;
     case UDP_SIG:
@@ -148,7 +148,7 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
 
         if (sport == DNS_PORT || dport == DNS_PORT)
         {
-            tmpSnifferData.strProto += " (DNS)";
+            tmpSnifferData.strProto ="DNS";
             tmpSnifferData.protoInfo.strAppProto += "DNS (Domain Name Server)";
         }
         else if (sport == SNMP_PORT || dport == SNMP_PORT)
@@ -162,6 +162,7 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
         }
         break;
     default:
+        tmpSnifferData.strProto = "IP";
         break;
     }
 

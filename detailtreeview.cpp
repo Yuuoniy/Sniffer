@@ -40,6 +40,9 @@ void DetailTreeView::ShowTreeAnalyseInfo(const SnifferData *snifferData)
     item->appendRow(new QStandardItem(snifferData->protoInfo.strSPort));
     item->appendRow(new QStandardItem(snifferData->protoInfo.strDPort));
 
-    item = new QStandardItem(snifferData->protoInfo.strAppProto);
-    detailModel->setItem(3, item);
+    if (snifferData->protoInfo.strAppProto!=""){
+        item = new QStandardItem(snifferData->protoInfo.strAppProto);
+        detailModel->setItem(3, item);
+    }
+
 }
