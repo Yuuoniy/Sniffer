@@ -64,14 +64,118 @@ void DetailTreeView::addEthernetInfo(const SnifferData *snifferData)
 void DetailTreeView::addNetworkInfo(const SnifferData *snifferData)
 {
     QStandardItem *item, *itemChild;
-    item = new QStandardItem(snifferData->protoInfo.strNetProto);
-    detailModel->setItem(network_layer, item);
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strVersion));
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strHeadLength));
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strLength));
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
+
+    if (snifferData->protoInfo.strNetProto.indexOf("IP") != -1)
+    {
+        item = new QStandardItem(snifferData->protoInfo.strNetProto);
+        detailModel->setItem(network_layer, item);
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strVersion));
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strHeadLength));
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strLength));
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
+    }
+    else if (snifferData->protoInfo.strNetProto.indexOf("ARP") != -1)
+    {
+
+        addARPInfo(snifferData);
+    }
 }
+
+QString mactos(mac_address address)
+{
+    QString str = QString("%1:%2:%3:%4:%5:%6")
+                      .arg(address.byte1, 0, 16)
+                      .arg(address.byte2, 0, 16)
+                      .arg(address.byte3, 0, 16)
+                      .arg(address.byte4, 0, 16)
+                      .arg(address.byte5, 0, 16)
+                      .arg(address.byte6, 0, 16);
+    return str;
+}
+
+QString iptos(struct ip_address address)
+{
+    QString str = QString("%1.%2.%3.%4")
+                      .arg(address.byte1)
+                      .arg(address.byte2)
+                      .arg(address.byte3)
+                      .arg(address.byte4);
+    return str;
+}
+
+void DetailTreeView::addARPInfo(const SnifferData *snifferData)
+{
+    // struct arphdr *arphdr;
+
+    QString hd_type;
+    u_short proto_type;
+    QString proto_type_str;
+    QString hd_len;
+    QString pro_addr_len;
+    u_short opcode;
+    QString opcode_str;
+    QString src_addr;
+    QString dst_addr;
+    QString sip_addr;
+    QString dip_addr;
+
+    hd_type = QString::number(ntohs(snifferData->protoInfo.ARP_header->hardware_type));
+    proto_type = ntohs(snifferData->protoInfo.ARP_header->protocal_type);
+    switch (proto_type)
+    {
+    case ETHER_TYPE_IPv4:
+        proto_type_str = QString("IPv4");
+        break;
+    case ETHER_TYPE_IPv6:
+        proto_type_str = QString("IPv6");
+        break;
+    default:
+        proto_type_str = QString("UNKNOWN");
+        break;
+    }
+    hd_len = QString::number(snifferData->protoInfo.ARP_header->hwadd_len);
+    pro_addr_len = QString::number(snifferData->protoInfo.ARP_header->proadd_len);
+    opcode = ntohs(snifferData->protoInfo.ARP_header->opcode);
+    switch (opcode)
+    {
+    case ARPOP_REQUEST:
+        opcode_str = QString("ARP Request");
+        break;
+    case ARPOP_REPLY:
+        opcode_str = QString("ARP Reply");
+        break;
+    case ARPOP_RREQUEST:
+        opcode_str = QString("RARP Request.");
+        break;
+    case ARPOP_RREPLY:
+        opcode_str = QString("RARP Reply");
+        break;
+    default:
+        opcode_str = QString("UNKNOWN ARP opcode");
+        break;
+    }
+    src_addr = mactos(snifferData->protoInfo.ARP_header->snether_address);
+    dst_addr = mactos(snifferData->protoInfo.ARP_header->dnether_address);
+    sip_addr = iptos(snifferData->protoInfo.ARP_header->sip_address);
+    dip_addr = iptos(snifferData->protoInfo.ARP_header->dip_address);
+
+    QStandardItem *item = new QStandardItem(QString("ARP (Address Resolution Protocol(%1))").arg(opcode_str));
+    detailModel->setItem(network_layer, item);
+
+    QList<QStandardItem *> childItems;
+    childItems.push_back(new QStandardItem(QString("Hardware type: %1").arg(hd_type)));
+    childItems.push_back(new QStandardItem(QString("Protocol type: %1(0x%2)").arg(proto_type_str).arg(proto_type, 4, 16, QChar('0'))));
+    childItems.push_back(new QStandardItem(QString("Hardware size: %1").arg(hd_len)));
+    childItems.push_back(new QStandardItem(QString("Protocol size: %1").arg(pro_addr_len)));
+    childItems.push_back(new QStandardItem(QString("Opcode: %1(%2)").arg(opcode_str).arg(opcode)));
+    childItems.push_back(new QStandardItem(QString("Sender MAC address: %1").arg(src_addr)));
+    childItems.push_back(new QStandardItem(QString("Sender IP address: %1").arg(sip_addr)));
+    childItems.push_back(new QStandardItem(QString("Target MAC address: %1").arg(dst_addr)));
+    childItems.push_back(new QStandardItem(QString("Sender MAC address: %1").arg(dip_addr)));
+     item->appendRows(childItems);
+}
+
 void DetailTreeView::addTransInfo(const SnifferData *snifferData)
 {
     if (snifferData->protoInfo.strTranProto == "")

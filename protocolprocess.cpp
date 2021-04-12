@@ -112,7 +112,7 @@ void ProtocolProcess::processIPPacket(const unsigned char *data)
 void ProtocolProcess::processARPPacket(const unsigned char *data)
 {
     displayData.strProto = "ARP";
-    parseData.strNetProto = "ARP";
+    parseData.strNetProto = "ARP (Address Resolution Protocol)";
     parseData.ARP_header = (arphdr *)(data + SIZE_ETHERNET);
 }
 

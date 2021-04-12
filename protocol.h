@@ -18,18 +18,50 @@ typedef struct ethhdr
 } ethhdr;
 
 // ARP 头部（28字节）
-typedef struct arphdr
+// typedef struct arphdr
+// {
+//     unsigned short arp_hrd;   // 硬件类型
+//     unsigned short arp_pro;   // 协议类型
+//     unsigned char arp_hln;    // 硬件地址长度
+//     unsigned char arp_pln;    // 协议地址长度
+//     unsigned short arp_op;    // ARP操作类型
+//     unsigned char arp_sha[6]; // 发送者的硬件地址
+//     unsigned long arp_spa;    // 发送者的协议地址
+//     unsigned char arp_tha[6]; // 目标的硬件地址
+//     unsigned long arp_tpa;    // 目标的协议地址
+// } arphdr;
+
+/* 6字节的MAC地址 */
+typedef struct mac_address{
+    u_char byte1;
+    u_char byte2;
+    u_char byte3;
+    u_char byte4;
+    u_char byte5;
+    u_char byte6;
+}mac_address;
+
+/* 4 bytes IP address */
+typedef struct ip_address
 {
-    unsigned short arp_hrd;   // 硬件类型
-    unsigned short arp_pro;   // 协议类型
-    unsigned char arp_hln;    // 硬件地址长度
-    unsigned char arp_pln;    // 协议地址长度
-    unsigned short arp_op;    // ARP操作类型
-    unsigned char arp_sha[6]; // 发送者的硬件地址
-    unsigned long arp_spa;    // 发送者的协议地址
-    unsigned char arp_tha[6]; // 目标的硬件地址
-    unsigned long arp_tpa;    // 目标的协议地址
-} arphdr;
+    u_char byte1;
+    u_char byte2;
+    u_char byte3;
+    u_char byte4;
+}ip_address;
+
+/*ARP首部*/
+typedef struct arphdr{
+    u_short hardware_type;              // 硬件类型 (16 bits)
+    u_short protocal_type;              //协议类型(16 bits)
+    u_char  hwadd_len;                  //硬件地址长度(8 bit)
+    u_char  proadd_len;                 //协议地址长度(8 bit)
+    u_short opcode;                     //操作类型(16 bits)
+    mac_address snether_address;        // 发送端以太网地址(48 bits)
+    ip_address  sip_address;              //发送端IP地址(32 bits)
+    mac_address dnether_address;       //目的以太网地址(48 bits)
+    ip_address  dip_address;             // 目的IP地址（32 bits）
+}arphdr;
 
 typedef struct iphdr
 {
@@ -223,3 +255,24 @@ struct SnifferData
 #define ENCAP_SIG (98)
 
 #endif // PROTOCOL_H
+
+
+/* ARP / RARP structs and definitions */
+#define ARPOP_REQUEST  1       /* ARP request.  */
+#define ARPOP_REPLY    2       /* ARP reply.  */
+/* Some OSes have different names, or don't define these at all */
+#define ARPOP_RREQUEST 3       /* RARP request.  */
+#define ARPOP_RREPLY   4       /* RARP reply.  */
+/*Additional parameters as per http://www.iana.org/assignments/arp-parameters*/
+#define ARPOP_DRARPREQUEST 5   /* DRARP request.  */
+#define ARPOP_DRARPREPLY 6     /* DRARP reply.  */
+#define ARPOP_DRARPERROR 7     /* DRARP error.  */
+#define ARPOP_IREQUEST 8       /* Inverse ARP (RFC 1293) request.  */
+#define ARPOP_IREPLY   9       /* Inverse ARP reply.  */
+#define ATMARPOP_NAK   10      /* ATMARP NAK.  */
+
+#define ETHER_TYPE_IPv4 0x0800
+#define ETHER_TYPE_IPv6 0x86DD
+#define ETHER_TYPE_ARP  0x0806
+#define ETHER_TYPE_RARP 0x8035
+
