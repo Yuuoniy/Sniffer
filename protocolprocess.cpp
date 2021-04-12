@@ -46,9 +46,12 @@ void ProtocolProcess::processEtherPacket(const unsigned char *data)
     switch (ether_type)
     {
     case 0x0608:
+        parseData.strType = "Type：ARP (0x0806)";
+
         processARPPacket(data);
         break;
     case 0x0008:
+        parseData.strType = "Type：IP (0x0800)";
         processIPPacket(data);
         break;
     default:
@@ -67,7 +70,7 @@ void ProtocolProcess::processEtherPacket(const unsigned char *data)
 void ProtocolProcess::processIPPacket(const unsigned char *data)
 {
     displayData.strProto = "IP";
-    parseData.strNetProto = "IP";
+    parseData.strNetProto = "IP (Internet Protocol)";
     parseData.IP_header = (iphdr *)(data + SIZE_ETHERNET);
     ip_len = (parseData.IP_header->ver_ihl & 0xF) * 4;
 
@@ -91,20 +94,20 @@ void ProtocolProcess::processIPPacket(const unsigned char *data)
 
     char szSize[6];
     sprintf(szSize, "%u", ip_len);
-    parseData.strHeadLength = QString(szSize) + QString(" bytes");
+    parseData.strHeadLength += QString(szSize) + QString(" bytes");
     int ip_all_len = ntohs(parseData.IP_header->tlen);
     sprintf(szSize, "%u", ip_all_len);
-    parseData.strLength = QString(szSize) + QString(" bytes");
+    parseData.strLength += QString(szSize) + QString(" bytes");
 
     char szSaddr[24], szDaddr[24];
     sprintf(szSaddr, "%d.%d.%d.%d", parseData.IP_header->saddr[0], parseData.IP_header->saddr[1], parseData.IP_header->saddr[2], parseData.IP_header->saddr[3]);
     sprintf(szDaddr, "%d.%d.%d.%d", parseData.IP_header->daddr[0], parseData.IP_header->daddr[1], parseData.IP_header->daddr[2], parseData.IP_header->daddr[3]);
 
-    displayData.strSIP = QString(szSaddr) + " : " + QString(displayData.strSPort);
-    displayData.strDIP = QString(szDaddr) + " : " + QString(displayData.strDPort);
+    displayData.strSIP = QString(szSaddr) + ":" + QString(displayData.strSPort);
+    displayData.strDIP = QString(szDaddr) + ":" + QString(displayData.strDPort);
 
-    parseData.strSIP = szSaddr;
-    parseData.strDIP = szDaddr;
+    parseData.strSIP += szSaddr;
+    parseData.strDIP += szDaddr;
 }
 void ProtocolProcess::processARPPacket(const unsigned char *data)
 {
@@ -167,7 +170,6 @@ void ProtocolProcess::processTCPPacket(const unsigned char *data)
     {
         processHTTPPacket(data);
     }
-
 
     char szSPort[6], szDPort[6];
     sprintf(szSPort, "%d", sport);

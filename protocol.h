@@ -161,21 +161,21 @@ struct AnalyseProtoType
     void init()
     {
         strEthTitle = "Ethernet II";
-        strDMac = "目标MAC地址：";
-        strSMac = "来源MAC地址：";
-        strType = "以太网类型：Internet Protocol (0x0800)";
+        strDMac = "Destination：";
+        strSMac = "Source：";
+        // strType = "Type：Internet Protocol (0x0800)";
+        strType = "";
 
         strNetProto = "";
-        strVersion = "版本：IPv4";
-        strHeadLength = "协议头长度：";
-        strLength = "总长：";
-        strNextProto = "高层协议类型：";
-        strSIP = "来源IP地址：";
-        strDIP = "目标IP地址：";
+        strVersion = "Version：IPv4";
+        strHeadLength = "Header Length：";
+        strLength = "Total Length：";
+        strSIP = "Source：";
+        strDIP = "Destination：";
 
-        strTranProto = "";
-        strSPort = "来源端口号：";
-        strDPort = "目标端口号：";
+        strTranProto = ""; 
+        strSPort = "Source Port：";
+        strDPort = "Destination Port：";
 
         strAppProto = "";
     }

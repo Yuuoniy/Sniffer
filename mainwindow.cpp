@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     pcap_if_t *alldevs, *d;
     char errbuf[PCAP_ERRBUF_SIZE];
     int i = 0;
-
+    this->setFont(QFont("Source Code Pro",9));
     if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &alldevs, errbuf) == -1)
     {
         QMessageBox::warning(this, "Error in pcap_findalldevs_ex: %s\n", errbuf);

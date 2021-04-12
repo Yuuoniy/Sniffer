@@ -10,7 +10,7 @@ void DetailTreeView::Setup()
 
     detailModel->clear();
     detailModel->setColumnCount(1);
-    detailModel->setHeaderData(0, Qt::Horizontal, "捕获数据分析：");
+    detailModel->setHeaderData(0, Qt::Horizontal, "Data Parse:");
 }
 void DetailTreeView::ShowTreeAnalyseInfo(const SnifferData *snifferData)
 {
@@ -44,7 +44,6 @@ void DetailTreeView::addFrameInfo(const SnifferData *snifferData)
 
 enum Layers
 {
-    frame_layer,
     ethernet_layer,
     network_layer,
     trans_layer,
@@ -70,7 +69,6 @@ void DetailTreeView::addNetworkInfo(const SnifferData *snifferData)
     item->appendRow(new QStandardItem(snifferData->protoInfo.strVersion));
     item->appendRow(new QStandardItem(snifferData->protoInfo.strHeadLength));
     item->appendRow(new QStandardItem(snifferData->protoInfo.strLength));
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strNextProto));
     item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
     item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
 }
