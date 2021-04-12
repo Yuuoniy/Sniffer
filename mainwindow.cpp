@@ -5,6 +5,7 @@
 #include <QList>
 #include <QModelIndex>
 #include <string>
+#include <QHeaderView>
 #include <QListWidget>
 #include <QComboBox>
 #include <QSplitter>
@@ -44,10 +45,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->packetTableView->verticalHeader()->hide();
     ui->packetTableView->setModel(PacketsListView::PacketModel);
     ui->packetTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->packetTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
     ui->detailTreeView->setModel(DetailTreeView::detailModel);
     QObject::connect(ui->packetTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(addDataToWidget(const QItemSelection &)));
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startCapture()));
     connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stop()));
+
 
 
     ui->textEdit->setStyleSheet("QTextEdit {margin-left:0px; margin-right:0px}");

@@ -158,11 +158,13 @@ void processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
         }
         else
         {
-            tmpSnifferData.protoInfo.strAppProto += "Unknown Proto";
+            tmpSnifferData.protoInfo.strAppProto = "";
         }
         break;
     default:
         tmpSnifferData.strProto = "IP";
+        tmpSnifferData.protoInfo.strTranProto = "";
+        tmpSnifferData.protoInfo.strAppProto = "";
         break;
     }
 

@@ -3,7 +3,7 @@
 
 #include <winsock2.h>
 #include <pcap.h>
-#include <WinSock2.h>
+// #include <WinSock2.h>
 
 /* ethernet headers are always 14 bytes [1] */
 #define SIZE_ETHERNET 14
@@ -130,7 +130,7 @@ struct AnalyseProtoType
     QString strSMac;
     QString strType;
 
-    QString strIPTitle; // 网络层
+    QString strNetProto; // 网络层
     QString strVersion;
     QString strHeadLength;
     QString strLength;
@@ -138,21 +138,34 @@ struct AnalyseProtoType
     QString strSIP;
     QString strDIP;
 
-    QString strTranProto; // 传输层
+    QString strTranProto; // 传输层:
     QString strSPort;
     QString strDPort;
 
     QString strAppProto; // 应用层
     QByteArray strSendInfo;
 
+    //other data
+    char timestamp[30];//时戳
+    struct pcap_pkthdr *header;//包头
+
+    struct ethhdr *ether_header; //以太网首部
+    struct iphdr *IP_header;//IPv4首部
+
+    struct udphdr *UDP_header;//UDP首部
+    struct tcphdr *TCP_header;//TCP首部
+    struct icmphdr *ICMP_header;//ICMP首部
+    struct igmphdr *IGMP_header;
+    struct arphdr *ARP_header;
+
     void init()
     {
-        strEthTitle = "数据链路层 - Ethrmet II";
+        strEthTitle = "Ethernet II";
         strDMac = "目标MAC地址：";
         strSMac = "来源MAC地址：";
         strType = "以太网类型：Internet Protocol (0x0800)";
 
-        strIPTitle = "网络层 - IP 协议 (Internet Protocol)";
+        strNetProto = "";
         strVersion = "版本：IPv4";
         strHeadLength = "协议头长度：";
         strLength = "总长：";
@@ -160,11 +173,11 @@ struct AnalyseProtoType
         strSIP = "来源IP地址：";
         strDIP = "目标IP地址：";
 
-        strTranProto = "传输层 - ";
+        strTranProto = "";
         strSPort = "来源端口号：";
         strDPort = "目标端口号：";
 
-        strAppProto = "应用层 - ";
+        strAppProto = "";
     }
 };
 
@@ -175,6 +188,8 @@ struct SnifferData
     QString strTime;            // 时间
     QString strSIP;             // 来源 IP 地址，格式 IP:port
     QString strDIP;             // 目标 IP 地址，格式 IP:port
+    QString strSPort;
+    QString strDPort;
     QString strProto;           // 使用的协议
     QString strLength;          // 数据长度
     QByteArray strData;         // 原始数据

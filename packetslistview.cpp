@@ -19,12 +19,14 @@ void PacketsListView::addPacketItem(SnifferData data)
     PacketModel->setItem(row, 5, new QStandardItem(QString(data.strLength)));
 }
 
+
+
 void PacketsListView::setListHeader()
 {
     PacketModel->clear();
-    PacketModel->setColumnCount(7);
-    char *headers[7] = {"No.", "Time", "Source", "Destionation", "Protocol", "Length", "Info"};
-    for (int i = 0; i <= 6; i++)
+    PacketModel->setColumnCount(6);
+    char *headers[6] = {"No.", "Time", "Source", "Destionation", "Protocol", "Length"};
+    for (int i = 0; i <= 5; i++)
     {
         PacketModel->setHeaderData(i, Qt::Horizontal, QString(headers[i]));
     }

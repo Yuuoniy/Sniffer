@@ -9,6 +9,7 @@ public:
     PacketsListView();
     static void addPacketItem(SnifferData item);
     void setListHeader();
+
     static QStandardItemModel *PacketModel;
 };
 

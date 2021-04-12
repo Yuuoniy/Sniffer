@@ -3,6 +3,7 @@
 #include <string>
 #include "global.h"
 #include "packet.h"
+#include "protocolprocess.h"
 #include "../process_protocol.h"
 using std::string;
 extern QList<string> devicesName;
@@ -50,8 +51,8 @@ void CaptureThread::run()
         qDebug() << res;
         if (res > 0 && header != NULL && data != NULL)
         {
-            processPacket(header, data);
-            
+            // processPacket(header, data);
+            ProtocolProcess::processPacket(header,data);
 
             
         }

@@ -1,0 +1,204 @@
+#include "protocolprocess.h"
+
+ProtocolProcess::ProtocolProcess()
+{
+}
+
+AnalyseProtoType ProtocolProcess::parseData;
+SnifferData ProtocolProcess::displayData;
+
+unsigned int ProtocolProcess::ip_len = 0;
+void ProtocolProcess::processPacket(const struct pcap_pkthdr *header, const unsigned char *data)
+{
+
+    displayData.pkt_data = (unsigned char *)data;
+    parseData.header = (struct pcap_pkthdr *)header;
+    QByteArray rawByteData;
+
+    parseData.init();
+    processBasicInfo(header);
+    processEtherPacket(data);
+    displayData.protoInfo = parseData;
+    Global::packets.push_back(displayData);
+    PacketsListView::addPacketItem(displayData);
+}
+// no. len, time
+void ProtocolProcess::processBasicInfo(const struct pcap_pkthdr *header)
+{
+    char szNum[10];
+    struct tm *ltime;
+    char timestr[16];
+    char szLength[6];
+    sprintf(szNum, "%d", Global::szNum);
+    displayData.strNum = szNum;
+    Global::szNum += 1;
+    time_t local_tv_sec = header->ts.tv_sec;
+    ltime = localtime(&local_tv_sec);
+    strftime(timestr, sizeof(timestr), "%H:%M:%S", ltime);
+    displayData.strTime = timestr;
+    sprintf(szLength, "%d", header->len);
+    displayData.strLength = szLength;
+}
+void ProtocolProcess::processEtherPacket(const unsigned char *data)
+{
+    parseData.ether_header = (ethhdr *)data;
+    int ether_type = parseData.ether_header->type;
+    switch (ether_type)
+    {
+    case 0x0608:
+        processARPPacket(data);
+        break;
+    case 0x0008:
+        processIPPacket(data);
+        break;
+    default:
+        break;
+    }
+    QByteArray DMac, SMac;
+    DMac.setRawData((const char *)parseData.ether_header->dest, 6);
+    SMac.setRawData((const char *)parseData.ether_header->src, 6);
+    DMac = DMac.toHex().toUpper();
+    SMac = SMac.toHex().toUpper();
+
+    parseData.strDMac = parseData.strDMac + DMac[0] + DMac[1] + "-" + DMac[2] + DMac[3] + "-" + DMac[4] + DMac[5] + "-" + DMac[6] + DMac[7] + "-" + DMac[8] + DMac[9] + "-" + DMac[10] + DMac[11];
+    parseData.strSMac = parseData.strSMac + SMac[0] + SMac[1] + "-" + SMac[2] + SMac[3] + "-" + SMac[4] + SMac[5] + "-" + SMac[6] + SMac[7] + "-" + SMac[8] + SMac[9] + "-" + SMac[10] + SMac[11];
+}
+
+void ProtocolProcess::processIPPacket(const unsigned char *data)
+{
+    displayData.strProto = "IP";
+    parseData.strNetProto = "IP";
+    parseData.IP_header = (iphdr *)(data + SIZE_ETHERNET);
+    ip_len = (parseData.IP_header->ver_ihl & 0xF) * 4;
+
+    switch (parseData.IP_header->proto)
+    {
+    case TCP_SIG:
+        processTCPPacket(data);
+        break;
+    case UDP_SIG:
+        processUDPPacket(data);
+        break;
+    case ICMP_SIG:
+        processICMPPacket(data);
+        break;
+    case IGMP_SIG:
+        processIGMPPacket(data);
+        break;
+    default:
+        break;
+    }
+
+    char szSize[6];
+    sprintf(szSize, "%u", ip_len);
+    parseData.strHeadLength = QString(szSize) + QString(" bytes");
+    int ip_all_len = ntohs(parseData.IP_header->tlen);
+    sprintf(szSize, "%u", ip_all_len);
+    parseData.strLength = QString(szSize) + QString(" bytes");
+
+    char szSaddr[24], szDaddr[24];
+    sprintf(szSaddr, "%d.%d.%d.%d", parseData.IP_header->saddr[0], parseData.IP_header->saddr[1], parseData.IP_header->saddr[2], parseData.IP_header->saddr[3]);
+    sprintf(szDaddr, "%d.%d.%d.%d", parseData.IP_header->daddr[0], parseData.IP_header->daddr[1], parseData.IP_header->daddr[2], parseData.IP_header->daddr[3]);
+
+    displayData.strSIP = QString(szSaddr) + " : " + QString(displayData.strSPort);
+    displayData.strDIP = QString(szDaddr) + " : " + QString(displayData.strDPort);
+
+    parseData.strSIP = szSaddr;
+    parseData.strDIP = szDaddr;
+}
+void ProtocolProcess::processARPPacket(const unsigned char *data)
+{
+    displayData.strProto = "ARP";
+    parseData.strNetProto = "ARP";
+    parseData.ARP_header = (arphdr *)(data + SIZE_ETHERNET);
+}
+
+void ProtocolProcess::processICMPPacket(const unsigned char *data)
+{
+    displayData.strProto = "ICMP";
+    parseData.strTranProto = "ICMP (Internet Control Message Protocol)";
+    parseData.ICMP_header = (icmphdr *)((unsigned char *)parseData.IP_header + ip_len);
+}
+
+void ProtocolProcess::processIGMPPacket(const unsigned char *data)
+{
+    displayData.strProto = "IGMP";
+    parseData.strTranProto = "IGMP (Internet Group Management Protocol)";
+
+    parseData.IGMP_header = (igmphdr *)((unsigned char *)parseData.IP_header + ip_len);
+}
+
+void ProtocolProcess::processUDPPacket(const unsigned char *data)
+{
+    displayData.strProto = "UDP";
+    parseData.strTranProto = "UDP (User Datagram Protocol)";
+    parseData.UDP_header = (udphdr *)((unsigned char *)parseData.IP_header + ip_len);
+    unsigned short sport = ntohs(parseData.UDP_header->sport); // 获得源端口和目的端口
+    unsigned short dport = ntohs(parseData.UDP_header->dport);
+    if (sport == DNS_PORT || dport == DNS_PORT)
+    {
+        processDNSPacket(data);
+    }
+    char szSPort[6], szDPort[6];
+    sprintf(szSPort, "%d", sport);
+    sprintf(szDPort, "%d", dport);
+    parseData.strSPort += szSPort;
+    parseData.strDPort += szDPort;
+    displayData.strSPort = szSPort;
+    displayData.strDPort = szDPort;
+}
+
+void ProtocolProcess::processTCPPacket(const unsigned char *data)
+{
+    displayData.strProto = "TCP";
+    parseData.strTranProto = "TCP (Transmission Control Protocol)";
+    parseData.TCP_header = (tcphdr *)((unsigned char *)parseData.IP_header + ip_len);
+    unsigned short sport = ntohs(parseData.TCP_header->sport);
+    unsigned short dport = ntohs(parseData.TCP_header->dport);
+    if (sport == FTP_PORT || dport == FTP_PORT)
+    {
+        processFTPPacket(data);
+    }
+    else if (sport == HTTPS_PORT || dport == HTTPS_PORT)
+    {
+        processHTTPSPacket(data);
+    }
+    else if (sport == HTTP_PORT || dport == HTTP_PORT)
+    {
+        processHTTPPacket(data);
+    }
+
+
+    char szSPort[6], szDPort[6];
+    sprintf(szSPort, "%d", sport);
+    sprintf(szDPort, "%d", dport);
+    parseData.strSPort += szSPort;
+    parseData.strDPort += szDPort;
+    displayData.strSPort = szSPort;
+    displayData.strDPort = szDPort;
+}
+
+void ProtocolProcess::processHTTPPacket(const unsigned char *data)
+{
+    displayData.strProto = "HTTP";
+    parseData.strAppProto = "HTTP (Hyper Text Transport Protocol)";
+}
+
+void ProtocolProcess::processHTTPSPacket(const unsigned char *data)
+{
+    displayData.strProto = "HTTPS";
+    parseData.strAppProto = "HTTPS (Hypertext Transfer "
+                            "Protocol over Secure Socket Layer)";
+}
+
+void ProtocolProcess::processFTPPacket(const unsigned char *data)
+{
+    displayData.strProto = "FTP";
+    parseData.strAppProto = "FTP (File Transfer Protocol)";
+}
+
+void ProtocolProcess::processDNSPacket(const unsigned char *data)
+{
+    displayData.strProto = "DNS";
+    parseData.strAppProto = "DNS (Domain Name Server)";
+}
