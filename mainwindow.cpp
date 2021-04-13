@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     pcap_if_t *alldevs, *d;
     char errbuf[PCAP_ERRBUF_SIZE];
     int i = 0;
-    this->setFont(QFont("Source Code Pro",9));
+    this->setFont(QFont("Source Code Pro", 9));
     if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &alldevs, errbuf) == -1)
     {
         QMessageBox::warning(this, "Error in pcap_findalldevs_ex: %s\n", errbuf);
@@ -47,14 +47,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->packetTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->packetTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-
     ui->detailTreeView->setModel(DetailTreeView::detailModel);
+    ui->clearButton->setDisabled(false);
     QObject::connect(ui->packetTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(addDataToWidget(const QItemSelection &)));
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startCapture()));
     connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stop()));
-
-
-
+    connect(ui->filterButton, SIGNAL(clicked()), this, SLOT(setFilterString()));
+    connect(ui->clearButton,SIGNAL(clicked()),this,SLOT(clearFilterString()));
     ui->textEdit->setStyleSheet("QTextEdit {margin-left:0px; margin-right:0px}");
     // ui->textEdit.setStyleSheet("QTextEdit {margin-left:0px; margin-right:0px}");
 }
@@ -69,6 +68,18 @@ void MainWindow::Helloworld()
     QMessageBox::warning(0, "hello", "hello");
 }
 
+void MainWindow::setFilterString()
+{
+    Global::filter = ui->filterlineEdit->text();
+    ui->clearButton->setDisabled(false);
+}
+
+void MainWindow::clearFilterString()
+{
+    Global::filter = "";
+    ui->filterlineEdit->setText("");
+    ui->clearButton->setDisabled(true);
+}
 void MainWindow::startCapture()
 {
 
@@ -98,46 +109,45 @@ void MainWindow::stop()
     capture.stop();
 }
 
-
-QString generateHexOutputFromData(unsigned char * data,int len){
+QString generateHexOutputFromData(unsigned char *data, int len)
+{
 
     QString hexText = QString("");
     char buf[6];
-    memset(buf,0,6);
-    for (int i = 1; i<len+1; i++)
+    memset(buf, 0, 6);
+    for (int i = 1; i < len + 1; i++)
     {
-        sprintf(buf,"%.2x ", data[i-1]);
-
+        sprintf(buf, "%.2x ", data[i - 1]);
 
         hexText += QString(buf);
         if ((i % 16) == 0)
             hexText += "\n";
-        memset(buf,0,6);
+        memset(buf, 0, 6);
     }
     return hexText;
-
 }
 
-QString generateACSIIOutputFromData(unsigned char * data,int len){
+QString generateACSIIOutputFromData(unsigned char *data, int len)
+{
     QString asciiText = QString("");
     char ch;
-    for (int i = 1; i<len+1; i++)
+    for (int i = 1; i < len + 1; i++)
     {
-        ch = data[i-1];
-        if(isprint(ch)){
-            asciiText+= ch;
-        }else{
-            asciiText+='.';
+        ch = data[i - 1];
+        if (isprint(ch))
+        {
+            asciiText += ch;
         }
-       
+        else
+        {
+            asciiText += '.';
+        }
+
         if ((i % 16) == 0)
             asciiText += "\n";
     }
     return asciiText;
-
 }
-
-
 
 void MainWindow::addDataToWidget(const QItemSelection &nowSelect)
 {
@@ -152,15 +162,13 @@ void MainWindow::addDataToWidget(const QItemSelection &nowSelect)
         QString output;
         int len = Global::packets.at(iNumber).strLength.toInt();
 
-        output = generateHexOutputFromData(Global::packets.at(iNumber).pkt_data,len);
+        output = generateHexOutputFromData(Global::packets.at(iNumber).pkt_data, len);
         ui->textEdit->setText(output);
 
-        output = generateACSIIOutputFromData(Global::packets.at(iNumber).pkt_data,len);
+        output = generateACSIIOutputFromData(Global::packets.at(iNumber).pkt_data, len);
         ui->acsiiTextEdit->setText(output);
         //        ui->textEdit->setText(getStringFromUnsignedChar(Global::packets.at(iNumber).pkt_data));
         //        explainEdit->setText(sniffer->snifferDataVector.at(iNumber).protoInfo.strSendInfo);
         //                originalEdit->setText(sniffer->snifferDataVector.at(iNumber-1).strData);
     }
 }
-
-

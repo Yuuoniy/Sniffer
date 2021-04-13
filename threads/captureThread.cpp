@@ -16,8 +16,6 @@ CaptureThread::CaptureThread()
     isStopped = false;
 }
 
-
-
 CaptureThread::~CaptureThread() {}
 
 void CaptureThread::stop()
@@ -25,6 +23,27 @@ void CaptureThread::stop()
     isStopped = true;
 }
 
+int setFilter(pcap_t *fp, QString filter)
+{
+
+    if (filter == "")
+        return -1;
+    struct bpf_program fcode;
+    bpf_u_int32 NetMask = 0xffffff;
+    //compile the filter
+    if (pcap_compile(fp, &fcode, filter.toStdString().c_str(), 1, NetMask) < 0)
+    {
+        fprintf(stderr, "\nError compiling filter: wrong syntax.\n");
+        return -1;
+    }
+    //set the filter
+    if (pcap_setfilter(fp, &fcode) < 0)
+    {
+        fprintf(stderr, "\nError setting the filter\n");
+        return -1;
+    }
+    return 0;
+}
 void CaptureThread::run()
 {
     pcap_t *adhandle;
@@ -42,6 +61,8 @@ void CaptureThread::run()
         QMessageBox::warning(0, "Warning!", "\nUnable to open the adapter. " + QString(name) + " is not supported by WinPcap\n");
         return;
     }
+
+    setFilter(adhandle,Global::filter);
     while (!isStopped)
     {
         struct pcap_pkthdr *header = NULL;
@@ -52,9 +73,7 @@ void CaptureThread::run()
         if (res > 0 && header != NULL && data != NULL)
         {
             // processPacket(header, data);
-            ProtocolProcess::processPacket(header,data);
-
-            
+            ProtocolProcess::processPacket(header, data);
         }
 
     } // while stopped

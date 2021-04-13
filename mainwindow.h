@@ -29,6 +29,8 @@ public slots:
     void startCapture();
     void stop();
     void addDataToWidget(const QItemSelection &nowSelect);
+    void setFilterString();
+    void clearFilterString();
 
 private:
     Ui::MainWindow *ui;
