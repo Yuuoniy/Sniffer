@@ -32,14 +32,15 @@ typedef struct ethhdr
 // } arphdr;
 
 /* 6字节的MAC地址 */
-typedef struct mac_address{
+typedef struct mac_address
+{
     u_char byte1;
     u_char byte2;
     u_char byte3;
     u_char byte4;
     u_char byte5;
     u_char byte6;
-}mac_address;
+} mac_address;
 
 /* 4 bytes IP address */
 typedef struct ip_address
@@ -48,25 +49,24 @@ typedef struct ip_address
     u_char byte2;
     u_char byte3;
     u_char byte4;
-}ip_address;
+} ip_address;
 
 /*ARP首部*/
-typedef struct arphdr{
-    u_short hardware_type;              // 硬件类型 (16 bits)
-    u_short protocal_type;              //协议类型(16 bits)
-    u_char  hwadd_len;                  //硬件地址长度(8 bit)
-    u_char  proadd_len;                 //协议地址长度(8 bit)
-    u_short opcode;                     //操作类型(16 bits)
-    mac_address snether_address;        // 发送端以太网地址(48 bits)
-    ip_address  sip_address;              //发送端IP地址(32 bits)
-    mac_address dnether_address;       //目的以太网地址(48 bits)
-    ip_address  dip_address;             // 目的IP地址（32 bits）
-}arphdr;
+typedef struct arphdr
+{
+    u_short hardware_type;       // 硬件类型 (16 bits)
+    u_short protocal_type;       //协议类型(16 bits)
+    u_char hwadd_len;            //硬件地址长度(8 bit)
+    u_char proadd_len;           //协议地址长度(8 bit)
+    u_short opcode;              //操作类型(16 bits)
+    mac_address snether_address; // 发送端以太网地址(48 bits)
+    ip_address sip_address;      //发送端IP地址(32 bits)
+    mac_address dnether_address; //目的以太网地址(48 bits)
+    ip_address dip_address;      // 目的IP地址（32 bits）
+} arphdr;
 
 typedef struct iphdr
 {
-    // u_char ihl:4; //头部长度4bit
-    // u_char version:4; //版本号4bit
     u_char ver_ihl;   // 版本 (4 bits) + 首部长度 (4 bits)
     u_char tos;       //TOS 服务类型
     u_short tlen;     //包总长 u_short占两个字节
@@ -113,15 +113,15 @@ typedef struct ipv6hdr
 
 typedef struct tcphdr
 {
-    u_short sport; //src 16
-    u_short dport; //目的端口地址 16位
-    u_int seq;     //序列号 32位
-    u_int ack; //确认序列号
-    u_short tcp_res; //TCP头长(4 bits)+保留位(6 bits)+Flags(URG+ACK+PSH+RST+SYN+FIN)
-    u_short windsize;       //窗口大小 16位
-    u_short crc;        //校验和 16位
-    u_short urgp;      //紧急指针 16位
-    u_int opt;            //选项
+    u_short sport;    //src 16
+    u_short dport;    //目的端口地址 16位
+    u_int seq;        //序列号 32位
+    u_int ack;        //确认序列号
+    u_short tcp_res;  //TCP头长(4 bits)+保留位(6 bits)+Flags(URG+ACK+PSH+RST+SYN+FIN)
+    u_short windsize; //窗口大小 16位
+    u_short crc;      //校验和 16位
+    u_short urgp;     //紧急指针 16位
+    u_int opt;        //选项
 } tcphdr;
 
 typedef struct udphdr
@@ -177,15 +177,15 @@ struct AnalyseProtoType
     QByteArray strSendInfo;
 
     //other data
-    char timestamp[30];//时戳
-    struct pcap_pkthdr *header;//包头
+    char timestamp[30];         //时戳
+    struct pcap_pkthdr *header; //包头
 
     struct ethhdr *ether_header; //以太网首部
-    struct iphdr *IP_header;//IPv4首部
+    struct iphdr *IP_header;     //IPv4首部
 
-    struct udphdr *UDP_header;//UDP首部
-    struct tcphdr *TCP_header;//TCP首部
-    struct icmphdr *ICMP_header;//ICMP首部
+    struct udphdr *UDP_header;   //UDP首部
+    struct tcphdr *TCP_header;   //TCP首部
+    struct icmphdr *ICMP_header; //ICMP首部
     struct igmphdr *IGMP_header;
     struct arphdr *ARP_header;
 
@@ -204,7 +204,7 @@ struct AnalyseProtoType
         strSIP = "Source：";
         strDIP = "Destination：";
 
-        strTranProto = ""; 
+        strTranProto = "";
         strSPort = "Source Port：";
         strDPort = "Destination Port：";
 
@@ -215,16 +215,16 @@ struct AnalyseProtoType
 // 捕获的数据结构
 struct SnifferData
 {
-    QString strNum;             // 序号
-    QString strTime;            // 时间
-    QString strSIP;             // 来源 IP 地址，格式 IP:port
-    QString strDIP;             // 目标 IP 地址，格式 IP:port
+    QString strNum;  // 序号
+    QString strTime; // 时间
+    QString strSIP;  // 来源 IP 地址，格式 IP:port
+    QString strDIP;  // 目标 IP 地址，格式 IP:port
     QString strSPort;
     QString strDPort;
-    QString strProto;           // 使用的协议
-    QString strLength;          // 数据长度
-    QByteArray strData;         // 原始数据
-    unsigned char * pkt_data;
+    QString strProto;   // 使用的协议
+    QString strLength;  // 数据长度
+    QByteArray strData; // 原始数据
+    unsigned char *pkt_data;
     AnalyseProtoType protoInfo; // 树形显示结果的数据结构
 };
 
@@ -256,23 +256,21 @@ struct SnifferData
 
 #endif // PROTOCOL_H
 
-
 /* ARP / RARP structs and definitions */
-#define ARPOP_REQUEST  1       /* ARP request.  */
-#define ARPOP_REPLY    2       /* ARP reply.  */
+#define ARPOP_REQUEST 1 /* ARP request.  */
+#define ARPOP_REPLY 2   /* ARP reply.  */
 /* Some OSes have different names, or don't define these at all */
-#define ARPOP_RREQUEST 3       /* RARP request.  */
-#define ARPOP_RREPLY   4       /* RARP reply.  */
+#define ARPOP_RREQUEST 3 /* RARP request.  */
+#define ARPOP_RREPLY 4   /* RARP reply.  */
 /*Additional parameters as per http://www.iana.org/assignments/arp-parameters*/
-#define ARPOP_DRARPREQUEST 5   /* DRARP request.  */
-#define ARPOP_DRARPREPLY 6     /* DRARP reply.  */
-#define ARPOP_DRARPERROR 7     /* DRARP error.  */
-#define ARPOP_IREQUEST 8       /* Inverse ARP (RFC 1293) request.  */
-#define ARPOP_IREPLY   9       /* Inverse ARP reply.  */
-#define ATMARPOP_NAK   10      /* ATMARP NAK.  */
+#define ARPOP_DRARPREQUEST 5 /* DRARP request.  */
+#define ARPOP_DRARPREPLY 6   /* DRARP reply.  */
+#define ARPOP_DRARPERROR 7   /* DRARP error.  */
+#define ARPOP_IREQUEST 8     /* Inverse ARP (RFC 1293) request.  */
+#define ARPOP_IREPLY 9       /* Inverse ARP reply.  */
+#define ATMARPOP_NAK 10      /* ATMARP NAK.  */
 
 #define ETHER_TYPE_IPv4 0x0800
 #define ETHER_TYPE_IPv6 0x86DD
-#define ETHER_TYPE_ARP  0x0806
+#define ETHER_TYPE_ARP 0x0806
 #define ETHER_TYPE_RARP 0x8035
-

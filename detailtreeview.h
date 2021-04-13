@@ -12,7 +12,6 @@ public:
     DetailTreeView();
     static void Setup();
     static void ShowTreeAnalyseInfo(const SnifferData *snifferData);
-    static void addFrameInfo(const SnifferData *snifferData);
     static void addEthernetInfo(const SnifferData *snifferData);
 
     static void addNetworkInfo(const SnifferData *snifferData);

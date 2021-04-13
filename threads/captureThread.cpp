@@ -2,9 +2,7 @@
 #include <QString>
 #include <string>
 #include "global.h"
-#include "packet.h"
 #include "protocolprocess.h"
-#include "../process_protocol.h"
 using std::string;
 extern QList<string> devicesName;
 extern int interface_selected;
@@ -62,21 +60,18 @@ void CaptureThread::run()
         return;
     }
 
-    setFilter(adhandle,Global::filter);
+    setFilter(adhandle, Global::filter);
     while (!isStopped)
     {
         struct pcap_pkthdr *header = NULL;
         const u_char *data = NULL;
-
         res = pcap_next_ex(adhandle, &header, &data);
-        qDebug() << res;
         if (res > 0 && header != NULL && data != NULL)
         {
-            // processPacket(header, data);
             ProtocolProcess::processPacket(header, data);
         }
-
-    } // while stopped
+    }
+    // while stopped
     isStopped = false;
     qDebug() << "emit CaptureStopped";
     return;

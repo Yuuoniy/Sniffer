@@ -15,31 +15,10 @@ void DetailTreeView::Setup()
 void DetailTreeView::ShowTreeAnalyseInfo(const SnifferData *snifferData)
 {
     Setup();
-    addFrameInfo(snifferData);
     addEthernetInfo(snifferData);
     addNetworkInfo(snifferData);
     addTransInfo(snifferData);
     addAppInfo(snifferData);
-}
-
-void DetailTreeView::addFrameInfo(const SnifferData *snifferData)
-{
-    /* Frame Info */
-    //    QString arrivedTime = Globe::capPacket.OIndex->timestamp;
-    //    QString devName = Globe::capPacket.OIndex->NAname;
-    //    QString packLen = QString::number(Globe::capPacket.OIndex->header.len);
-    //    QString frameProto = Globe::capPacket.OIndex->Netpro;
-    //    strText = QString("Frame: %1 bytes captured on %2").arg(packLen,devName);
-    //    QStandardItem *frameItem = new QStandardItem(strText);
-    //    item = new QStandardItem(QString("Interface name: %1").arg(devName));
-    //    childItems.push_back(item);
-    //    item = new QStandardItem(QString("Encapsulation type: %1").arg(frameProto));
-    //    childItems.push_back(item);
-    //    item = new QStandardItem(QString("Arrival time: %1").arg(arrivedTime));
-    //    childItems.push_back(item);
-    //    frameItem->appendRows(childItems);
-    //    //rootItem->appendRow(frameItem);
-    //    DetailModel->appendRow(frameItem);
 }
 
 enum Layers
@@ -173,7 +152,7 @@ void DetailTreeView::addARPInfo(const SnifferData *snifferData)
     childItems.push_back(new QStandardItem(QString("Sender IP address: %1").arg(sip_addr)));
     childItems.push_back(new QStandardItem(QString("Target MAC address: %1").arg(dst_addr)));
     childItems.push_back(new QStandardItem(QString("Sender MAC address: %1").arg(dip_addr)));
-     item->appendRows(childItems);
+    item->appendRows(childItems);
 }
 
 void DetailTreeView::addTransInfo(const SnifferData *snifferData)

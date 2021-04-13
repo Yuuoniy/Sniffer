@@ -12,8 +12,8 @@ public:
     ProtocolProcess();
     static void processPacket(const struct pcap_pkthdr *header, const unsigned char *data);
     static void processEtherPacket(const unsigned char *);
-    static void processIPPacket(const unsigned char *buffer);
-    static void processARPPacket(const unsigned char *buffer);
+    static void processIPPacket(const unsigned char *);
+    static void processARPPacket(const unsigned char *);
     static void processICMPPacket(const unsigned char *);
 
     static void processIGMPPacket(const unsigned char *);
@@ -32,7 +32,6 @@ private:
     static AnalyseProtoType parseData;
     static SnifferData displayData;
     static unsigned int ip_len;
-
 };
 
 #endif // PROTOCOLPROCESS_H

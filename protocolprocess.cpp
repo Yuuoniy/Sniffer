@@ -73,7 +73,6 @@ void ProtocolProcess::processIPPacket(const unsigned char *data)
     parseData.strNetProto = "IP (Internet Protocol)";
     parseData.IP_header = (iphdr *)(data + SIZE_ETHERNET);
     ip_len = (parseData.IP_header->ver_ihl & 0xF) * 4;
-
     switch (parseData.IP_header->proto)
     {
     case TCP_SIG:

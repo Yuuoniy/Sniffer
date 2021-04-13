@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     pcap_if_t *alldevs, *d;
     char errbuf[PCAP_ERRBUF_SIZE];
     int i = 0;
-    QFont  font= QFont("Consolas", 10);
+    QFont font = QFont("Consolas", 10);
     this->setFont(font);
     if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &alldevs, errbuf) == -1)
     {
@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startCapture()));
     connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stop()));
     connect(ui->filterButton, SIGNAL(clicked()), this, SLOT(setFilterString()));
-    connect(ui->clearButton,SIGNAL(clicked()),this,SLOT(clearFilterString()));
+    connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(clearFilterString()));
     ui->textEdit->setStyleSheet("QTextEdit {margin-left:0px; margin-right:0px}");
     // ui->textEdit.setStyleSheet("QTextEdit {margin-left:0px; margin-right:0px}");
 }
@@ -110,30 +110,18 @@ void MainWindow::stop()
     capture.stop();
 }
 
-QString generateHexOutputFromData(unsigned char *data, int len)
+QString generateOutputFromData(unsigned char *data, int len)
 {
 
-    QString hexText = QString("");
+    QString hexText = QString("0010  ");
+    QString asciiText = QString("");
     char buf[6];
+    char ch;
     memset(buf, 0, 6);
     for (int i = 1; i < len + 1; i++)
     {
         sprintf(buf, "%.2x ", data[i - 1]);
-
         hexText += QString(buf);
-        if ((i % 16) == 0)
-            hexText += "\n";
-        memset(buf, 0, 6);
-    }
-    return hexText;
-}
-
-QString generateACSIIOutputFromData(unsigned char *data, int len)
-{
-    QString asciiText = QString("");
-    char ch;
-    for (int i = 1; i < len + 1; i++)
-    {
         ch = data[i - 1];
         if (isprint(ch))
         {
@@ -143,11 +131,16 @@ QString generateACSIIOutputFromData(unsigned char *data, int len)
         {
             asciiText += '.';
         }
-
         if ((i % 16) == 0)
-            asciiText += "\n";
+        {
+            hexText += "\t" + asciiText + "\n";
+            hexText += QString("%1  ").arg((i / 16 + 1) * 10, 4, 10, QLatin1Char('0'));
+            asciiText = "";
+        }
+
+        memset(buf, 0, 6);
     }
-    return asciiText;
+    return hexText;
 }
 
 void MainWindow::addDataToWidget(const QItemSelection &nowSelect)
@@ -163,13 +156,7 @@ void MainWindow::addDataToWidget(const QItemSelection &nowSelect)
         QString output;
         int len = Global::packets.at(iNumber).strLength.toInt();
 
-        output = generateHexOutputFromData(Global::packets.at(iNumber).pkt_data, len);
+        output = generateOutputFromData(Global::packets.at(iNumber).pkt_data, len);
         ui->textEdit->setText(output);
-
-        output = generateACSIIOutputFromData(Global::packets.at(iNumber).pkt_data, len);
-        ui->acsiiTextEdit->setText(output);
-        //        ui->textEdit->setText(getStringFromUnsignedChar(Global::packets.at(iNumber).pkt_data));
-        //        explainEdit->setText(sniffer->snifferDataVector.at(iNumber).protoInfo.strSendInfo);
-        //                originalEdit->setText(sniffer->snifferDataVector.at(iNumber-1).strData);
     }
 }
