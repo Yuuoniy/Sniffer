@@ -44,21 +44,39 @@ void DetailTreeView::addNetworkInfo(const SnifferData *snifferData)
 {
     QStandardItem *item, *itemChild;
 
-    if (snifferData->protoInfo.strNetProto.indexOf("IP") != -1)
+    if (snifferData->protoInfo.strNetProto.indexOf("IPv4") != -1)
     {
-        item = new QStandardItem(snifferData->protoInfo.strNetProto);
-        detailModel->setItem(network_layer, item);
-        item->appendRow(new QStandardItem(snifferData->protoInfo.strVersion));
-        item->appendRow(new QStandardItem(snifferData->protoInfo.strHeadLength));
-        item->appendRow(new QStandardItem(snifferData->protoInfo.strLength));
-        item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
-        item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
+        addIPv4Info(snifferData);
+    }
+    else if (snifferData->protoInfo.strNetProto.indexOf("IPv6") != -1)
+    {
+        addIPv6Info(snifferData);
     }
     else if (snifferData->protoInfo.strNetProto.indexOf("ARP") != -1)
     {
 
         addARPInfo(snifferData);
     }
+}
+
+void DetailTreeView::addIPv4Info(const SnifferData *snifferData)
+{
+    QStandardItem *item = new QStandardItem(snifferData->protoInfo.strNetProto);
+    detailModel->setItem(network_layer, item);
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strVersion));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strHeadLength));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strLength));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
+}
+
+void DetailTreeView::addIPv6Info(const SnifferData *snifferData)
+{
+    ipv6hdr *hdr = snifferData->protoInfo.IPv6_header;
+    QStandardItem *item = new QStandardItem(snifferData->protoInfo.strNetProto);
+    detailModel->setItem(network_layer, item);
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
+    item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
 }
 
 QString mactos(mac_address address)
@@ -80,6 +98,29 @@ QString iptos(struct ip_address address)
                       .arg(address.byte2)
                       .arg(address.byte3)
                       .arg(address.byte4);
+    return str;
+}
+
+QString ip6tos(ipv6_address address)
+{
+    QString str = QString("%1%2:%3%4:%5%6:%7%8:%9%10:%11%12:%13%14:%15%16")
+                      .arg(address.byte1, 0, 16)
+                      .arg(address.byte2, 0, 16)
+                      .arg(address.byte3, 0, 16)
+                      .arg(address.byte4, 0, 16)
+                      .arg(address.byte5, 0, 16)
+                      .arg(address.byte6, 0, 16)
+                      .arg(address.byte7, 0, 16)
+                      .arg(address.byte8, 0, 16)
+                      .arg(address.byte9, 0, 16)
+                      .arg(address.byte10, 0, 16)
+                      .arg(address.byte11, 0, 16)
+                      .arg(address.byte12, 0, 16)
+                      .arg(address.byte13, 0, 16)
+                      .arg(address.byte14, 0, 16)
+                      .arg(address.byte15, 0, 16)
+                      .arg(address.byte16, 0, 16);
+
     return str;
 }
 

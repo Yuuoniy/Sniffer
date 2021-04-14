@@ -39,7 +39,7 @@
     <item row="1" column="0">
      <widget class="QLineEdit" name="filterlineEdit">
       <property name="placeholderText">
-       <string>Apply a display filter</string>
+       <string>Apply a capture filter</string>
       </property>
      </widget>
     </item>

@@ -47,12 +47,15 @@ void ProtocolProcess::processEtherPacket(const unsigned char *data)
     {
     case 0x0608:
         parseData.strType = "Type：ARP (0x0806)";
-
         processARPPacket(data);
         break;
     case 0x0008:
-        parseData.strType = "Type：IP (0x0800)";
+        parseData.strType = "Type：IPv4 (0x0800)";
         processIPPacket(data);
+        break;
+    case 0xdd86:
+        parseData.strType = "Type：IPv6 (0x86DD)";
+        processIPv6Packet(data);
         break;
     default:
         break;
@@ -70,7 +73,7 @@ void ProtocolProcess::processEtherPacket(const unsigned char *data)
 void ProtocolProcess::processIPPacket(const unsigned char *data)
 {
     displayData.strProto = "IP";
-    parseData.strNetProto = "IP (Internet Protocol)";
+    parseData.strNetProto = "IPv4 (Internet Protocol version 4)";
     parseData.IP_header = (iphdr *)(data + SIZE_ETHERNET);
     ip_len = (parseData.IP_header->ver_ihl & 0xF) * 4;
     switch (parseData.IP_header->proto)
@@ -108,6 +111,54 @@ void ProtocolProcess::processIPPacket(const unsigned char *data)
     parseData.strSIP += szSaddr;
     parseData.strDIP += szDaddr;
 }
+
+QString ip6tos(ipv6_address &address)
+{
+    QString str = QString("%1%2:%3%4:%5%6:%7%8:%9%10:%11%12:%13%14:%15%16")
+                      .arg(address.byte1, 0, 16)
+                      .arg(address.byte2, 0, 16)
+                      .arg(address.byte3, 0, 16)
+                      .arg(address.byte4, 0, 16)
+                      .arg(address.byte5, 0, 16)
+                      .arg(address.byte6, 0, 16)
+                      .arg(address.byte7, 0, 16)
+                      .arg(address.byte8, 0, 16)
+                      .arg(address.byte9, 0, 16)
+                      .arg(address.byte10, 0, 16)
+                      .arg(address.byte11, 0, 16)
+                      .arg(address.byte12, 0, 16)
+                      .arg(address.byte13, 0, 16)
+                      .arg(address.byte14, 0, 16)
+                      .arg(address.byte15, 0, 16)
+                      .arg(address.byte16, 0, 16);
+
+    return str;
+}
+
+void ProtocolProcess::processIPv6Packet(const unsigned char *data)
+{
+    displayData.strProto = "IP";
+    parseData.strNetProto = "IPv6 (Internet Protocol version 6)";
+    parseData.IPv6_header = (ipv6hdr *)(data + SIZE_ETHERNET);
+    ip_len = 40;
+    if (parseData.IPv6_header->next_header == PROTO_TYPE_TCP)
+    {
+        processTCPPacket(data);
+    }
+    else if (parseData.IPv6_header->next_header == PROTO_TYPE_UDP)
+    {
+        processUDPPacket(data);
+    }
+    else if (parseData.IPv6_header->next_header == PROTO_TYPE_ICMPv6)
+    {
+        processICMPv6Packet(data);
+    }
+    displayData.strSIP = ip6tos(parseData.IPv6_header->source_ip) + ":" + QString(displayData.strSPort);
+    displayData.strDIP = ip6tos(parseData.IPv6_header->dest_ip) + ":" + QString(displayData.strDPort);
+    parseData.strSIP += ip6tos(parseData.IPv6_header->source_ip);
+    parseData.strDIP += ip6tos(parseData.IPv6_header->dest_ip);
+}
+
 void ProtocolProcess::processARPPacket(const unsigned char *data)
 {
     displayData.strProto = "ARP";
@@ -122,6 +173,12 @@ void ProtocolProcess::processICMPPacket(const unsigned char *data)
     parseData.ICMP_header = (icmphdr *)((unsigned char *)parseData.IP_header + ip_len);
 }
 
+void ProtocolProcess::processICMPv6Packet(const unsigned char *data)
+{
+    displayData.strProto = "ICMPv6";
+    parseData.strTranProto = "ICMPv6 (Internet Control Message Protocol Version 6)";
+}
+
 void ProtocolProcess::processIGMPPacket(const unsigned char *data)
 {
     displayData.strProto = "IGMP";
@@ -134,7 +191,10 @@ void ProtocolProcess::processUDPPacket(const unsigned char *data)
 {
     displayData.strProto = "UDP";
     parseData.strTranProto = "UDP (User Datagram Protocol)";
-    parseData.UDP_header = (udphdr *)((unsigned char *)parseData.IP_header + ip_len);
+    if (parseData.IP_header != nullptr)
+        parseData.UDP_header = (udphdr *)((unsigned char *)parseData.IP_header + ip_len);
+    else
+        parseData.UDP_header = (udphdr *)((unsigned char *)parseData.IPv6_header + ip_len);
     unsigned short sport = ntohs(parseData.UDP_header->sport); // 获得源端口和目的端口
     unsigned short dport = ntohs(parseData.UDP_header->dport);
     if (sport == DNS_PORT || dport == DNS_PORT)
@@ -154,7 +214,11 @@ void ProtocolProcess::processTCPPacket(const unsigned char *data)
 {
     displayData.strProto = "TCP";
     parseData.strTranProto = "TCP (Transmission Control Protocol)";
-    parseData.TCP_header = (tcphdr *)((unsigned char *)parseData.IP_header + ip_len);
+    //ipv4 or ipv6
+    if (parseData.IP_header != nullptr)
+        parseData.TCP_header = (tcphdr *)((unsigned char *)parseData.IP_header + ip_len);
+    else
+        parseData.TCP_header = (tcphdr *)((unsigned char *)parseData.IPv6_header + ip_len);
     unsigned short sport = ntohs(parseData.TCP_header->sport);
     unsigned short dport = ntohs(parseData.TCP_header->dport);
     if (sport == FTP_PORT || dport == FTP_PORT)

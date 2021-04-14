@@ -67,6 +67,7 @@ typedef struct arphdr
 
 typedef struct iphdr
 {
+
     u_char ver_ihl;   // 版本 (4 bits) + 首部长度 (4 bits)
     u_char tos;       //TOS 服务类型
     u_short tlen;     //包总长 u_short占两个字节
@@ -182,6 +183,7 @@ struct AnalyseProtoType
 
     struct ethhdr *ether_header; //以太网首部
     struct iphdr *IP_header;     //IPv4首部
+    struct ipv6hdr *IPv6_header;
 
     struct udphdr *UDP_header;   //UDP首部
     struct tcphdr *TCP_header;   //TCP首部
@@ -274,3 +276,8 @@ struct SnifferData
 #define ETHER_TYPE_IPv6 0x86DD
 #define ETHER_TYPE_ARP 0x0806
 #define ETHER_TYPE_RARP 0x8035
+
+#define PROTO_TYPE_ICMP 1
+#define PROTO_TYPE_TCP 6
+#define PROTO_TYPE_UDP 17
+#define PROTO_TYPE_ICMPv6 58
