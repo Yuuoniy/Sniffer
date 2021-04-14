@@ -8,6 +8,7 @@ QString ip6tos(ipv6_address address);
 QString mactos(mac_address address);
 QString iptos(struct ip_address address);
 QString generateOutputFromData(unsigned char *data, int len);
+QString escape(QString origin);
 enum Layers
 {
     ethernet_layer,

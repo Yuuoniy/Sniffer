@@ -8,29 +8,6 @@
 /* ethernet headers are always 14 bytes [1] */
 #define SIZE_ETHERNET 14
 
-typedef struct ethhdr
-{
-    u_char dest[6]; //6个字节 目标地址
-    u_char src[6];  //6个字节 源地址
-    u_short type;   //2个字节 类型
-    //#define IP 0x0800
-    //#define ARP 0x0806
-} ethhdr;
-
-// ARP 头部（28字节）
-// typedef struct arphdr
-// {
-//     unsigned short arp_hrd;   // 硬件类型
-//     unsigned short arp_pro;   // 协议类型
-//     unsigned char arp_hln;    // 硬件地址长度
-//     unsigned char arp_pln;    // 协议地址长度
-//     unsigned short arp_op;    // ARP操作类型
-//     unsigned char arp_sha[6]; // 发送者的硬件地址
-//     unsigned long arp_spa;    // 发送者的协议地址
-//     unsigned char arp_tha[6]; // 目标的硬件地址
-//     unsigned long arp_tpa;    // 目标的协议地址
-// } arphdr;
-
 /* 6字节的MAC地址 */
 typedef struct mac_address
 {
@@ -41,6 +18,15 @@ typedef struct mac_address
     u_char byte5;
     u_char byte6;
 } mac_address;
+
+typedef struct ethhdr
+{
+    u_char dest[6]; //6个字节 目标地址
+    u_char src[6];  //6个字节 源地址
+    u_short type;   //2个字节 类型
+    //#define IP 0x0800
+    //#define ARP 0x0806
+} ethhdr;
 
 /* 4 bytes IP address */
 typedef struct ip_address
@@ -80,6 +66,14 @@ typedef struct iphdr
     unsigned char daddr[4];
     u_int op_pad; //选项等
 } iphdr;
+
+typedef struct igmphdr
+{
+    u_char igmp_type;          /* version & type of IGMP message  */
+    u_char igmp_code;          /* subtype for routing msgs        */
+    u_short igmp_cksum;        /* IP-style checksum               */
+    struct in_addr igmp_group; /* group address being reported    */
+} igmphdr;                     /*  (zero for queries)             */
 
 /* 16 bytes IPv6 address */
 typedef struct ipv6_address
@@ -282,4 +276,15 @@ struct SnifferData
 #define PROTO_TYPE_UDP 17
 #define PROTO_TYPE_ICMPv6 58
 
-
+/*
+ * Message types, including version number.
+ */
+#define IGMP_HOST_MEMBERSHIP_QUERY 0x11     /* membership query         */
+#define IGMP_v1_HOST_MEMBERSHIP_REPORT 0x12 /* Ver. 1 membership report */
+#define IGMP_DVMRP 0x13                     /* DVMRP routing message    */
+#define IGMP_PIM 0x14                       /* PIMv1 message (historic) */
+#define IGMP_v2_HOST_MEMBERSHIP_REPORT 0x16 /* Ver. 2 membership report */
+#define IGMP_HOST_LEAVE_MESSAGE 0x17        /* Leave-group message     */
+#define IGMP_MTRACE_REPLY 0x1e              /* mtrace(8) reply */
+#define IGMP_MTRACE_QUERY 0x1f              /* mtrace(8) probe */
+#define IGMP_v3_HOST_MEMBERSHIP_REPORT 0x22 /* Ver. 3 membership report */

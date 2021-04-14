@@ -6,7 +6,7 @@
 #include "protocol.h"
 #include "global.h"
 #include "packetslistview.h"
-
+#include "utils.h"
 class ProtocolProcess
 {
 public:

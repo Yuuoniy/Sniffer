@@ -90,13 +90,7 @@
      <string>Sniffer</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuAnalyze">
-    <property name="title">
-     <string>Analyze</string>
-    </property>
-   </widget>
    <addaction name="menuSniffer"/>
-   <addaction name="menuAnalyze"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actioncapture">

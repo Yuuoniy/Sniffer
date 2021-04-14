@@ -23,14 +23,14 @@ QString ip6tos(ipv6_address address)
 }
 QString mactos(mac_address address)
 {
-    QString str = QString("%1:%2:%3:%4:%5:%6")
-                      .arg(address.byte1, 0, 16)
-                      .arg(address.byte2, 0, 16)
-                      .arg(address.byte3, 0, 16)
-                      .arg(address.byte4, 0, 16)
-                      .arg(address.byte5, 0, 16)
-                      .arg(address.byte6, 0, 16);
-    return str;
+    QString str = QString("%1-%2-%3-%4-%5-%6")
+                      .arg(address.byte1, 2, 16, QLatin1Char('0'))
+                      .arg(address.byte2, 2, 16, QLatin1Char('0'))
+                      .arg(address.byte3, 2, 16, QLatin1Char('0'))
+                      .arg(address.byte4, 2, 16, QLatin1Char('0'))
+                      .arg(address.byte5, 2, 16, QLatin1Char('0'))
+                      .arg(address.byte6, 2, 16, QLatin1Char('0'));
+    return str.toUpper();
 }
 
 QString iptos(struct ip_address address)
@@ -74,4 +74,12 @@ QString generateOutputFromData(unsigned char *data, int len)
         memset(buf, 0, 6);
     }
     return hexText;
+}
+
+QString escape(QString origin)
+{
+    QString replaced(origin);
+    replaced.replace(QString("\r"), QString("\\r"));
+    replaced.replace(QString("\n"), QString("\\n"));
+    return replaced;
 }

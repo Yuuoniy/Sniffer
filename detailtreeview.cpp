@@ -150,15 +150,22 @@ void DetailTreeView::addTransInfo(const SnifferData *snifferData)
     QStandardItem *item, *itemChild;
     item = new QStandardItem(snifferData->protoInfo.strTranProto);
     detailModel->setItem(trans_layer, item);
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strSPort));
-    item->appendRow(new QStandardItem(snifferData->protoInfo.strDPort));
+
     if (snifferData->protoInfo.strTranProto.indexOf("TCP") != -1)
     {
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strSPort));
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strDPort));
         addTCPInfo(item, snifferData);
     }
     else if (snifferData->protoInfo.strTranProto.indexOf("UDP") != -1)
     {
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strSPort));
+        item->appendRow(new QStandardItem(snifferData->protoInfo.strDPort));
         addUDPInfo(item, snifferData);
+    }
+    else if (snifferData->protoInfo.strTranProto.indexOf("IGMP") != -1)
+    {
+        addIGMPInfo(item, snifferData);
     }
 }
 
@@ -201,6 +208,15 @@ void DetailTreeView::addUDPInfo(QStandardItem *item, const SnifferData *snifferD
     item->appendRows(childItems);
 }
 
+void DetailTreeView::addIGMPInfo(QStandardItem *item, const SnifferData *snifferData)
+{
+    igmphdr *IGMP_header = (igmphdr *)(snifferData->protoInfo.IGMP_header);
+    QString crc = QString::number(ntohs(IGMP_header->igmp_cksum));
+    QList<QStandardItem *> childItems;
+    childItems.push_back(new QStandardItem(QString("Checksum: %1").arg(crc)));
+    item->appendRows(childItems);
+}
+
 void DetailTreeView::addAppInfo(const SnifferData *snifferData)
 {
     if (snifferData->protoInfo.strAppProto == "")
@@ -215,14 +231,6 @@ void DetailTreeView::addAppInfo(const SnifferData *snifferData)
     }
 }
 
-QString escape(QString origin)
-{
-    QString replaced(origin);
-    replaced.replace(QString("\r"), QString("\\r"));
-    replaced.replace(QString("\n"), QString("\\n"));
-    return replaced;
-}
-
 void DetailTreeView::addHTTPInfo(QStandardItem *item, const SnifferData *snifferData)
 {
 
@@ -233,10 +241,13 @@ void DetailTreeView::addHTTPInfo(QStandardItem *item, const SnifferData *sniffer
     QRegularExpression httpConnectionReg("Connection: .+\r\n");
 
     QRegularExpression httpCacheControlReg("Cache-Control: .+\r\n");
+    QRegularExpression httpContentLengthReg("Content-Length: .+\r\n");
 
+    QRegularExpression httpDateReg("Date: .+\r\n");
     QRegularExpression httpUserAgentReg("User-Agent: .+\r\n");
 
-    QRegularExpression httpAcceptReg("Accept: .+\r\n");
+    // QRegularExpression httpAcceptReg("Accept: .+\r\n");
+    QRegularExpression httpSecAcceptReg("Sec-WebSocket-Accept: .+\r\n");
 
     QRegularExpression httpResponseReg("HTTP/1.1 .+\r\n");
 
@@ -252,7 +263,7 @@ void DetailTreeView::addHTTPInfo(QStandardItem *item, const SnifferData *sniffer
     }
     QString text = QString(http_txt.c_str());
     QString httpMethod, httpHost, httpConnection, httpCacheControl, httpUserAgent, httpAccept, httpResponse;
-
+    QString httpDate, httpContentLength;
     if (httpGetMethodReg.match(text).hasMatch())
         httpMethod = httpGetMethodReg.match(text).captured(0);
     if (httpHostReg.match(text).hasMatch())
@@ -263,11 +274,14 @@ void DetailTreeView::addHTTPInfo(QStandardItem *item, const SnifferData *sniffer
         httpCacheControl = httpCacheControlReg.match(text).captured(0);
     if (httpUserAgentReg.match(text).hasMatch())
         httpUserAgent = httpUserAgentReg.match(text).captured(0);
-    if (httpAcceptReg.match(text).hasMatch())
-        httpAccept = httpAcceptReg.match(text).captured(0);
+    if (httpSecAcceptReg.match(text).hasMatch())
+        httpAccept = httpSecAcceptReg.match(text).captured(0);
     if (httpResponseReg.match(text).hasMatch())
         httpResponse = httpResponseReg.match(text).captured(0);
-
+    if (httpDateReg.match(text).hasMatch())
+        httpDate = httpDateReg.match(text).captured(0);
+    if (httpContentLengthReg.match(text).hasMatch())
+        httpContentLength = httpContentLengthReg.match(text).captured(0);
     httpMethod = escape(httpMethod);
     httpHost = escape(httpHost);
     httpConnection = escape(httpConnection);
@@ -291,5 +305,9 @@ void DetailTreeView::addHTTPInfo(QStandardItem *item, const SnifferData *sniffer
         itemChild.push_back(new QStandardItem(QString(httpAccept)));
     if (!httpCacheControl.isEmpty())
         itemChild.push_back(new QStandardItem(QString(httpCacheControl)));
+    if (!httpDate.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpDate)));
+    if (!httpContentLength.isEmpty())
+        itemChild.push_back(new QStandardItem(QString(httpContentLength)));
     item->appendRows(itemChild);
 }

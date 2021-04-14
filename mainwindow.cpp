@@ -73,6 +73,11 @@ void MainWindow::showAllDevices()
 void MainWindow::setFilterString()
 {
     Global::filter = ui->filterlineEdit->text();
+    if (Global::filter == "")
+    {
+        QMessageBox::warning(this, "warning", "Please input a vaild filter string\n");
+    }
+    ui->filterButton->setDisabled(true);
     ui->clearButton->setDisabled(false);
 }
 
@@ -81,6 +86,7 @@ void MainWindow::clearFilterString()
     Global::filter = "";
     ui->filterlineEdit->setText("");
     ui->clearButton->setDisabled(true);
+    ui->filterButton->setDisabled(false);
 }
 void MainWindow::startCapture()
 {

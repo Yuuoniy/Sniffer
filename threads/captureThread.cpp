@@ -32,6 +32,7 @@ int setFilter(pcap_t *fp, QString filter)
     if (pcap_compile(fp, &fcode, filter.toStdString().c_str(), 1, NetMask) < 0)
     {
         fprintf(stderr, "\nError compiling filter: wrong syntax.\n");
+        QMessageBox::warning(0, "warning", "Please input a vaild filter string\n");
         return -1;
     }
     //set the filter
@@ -61,6 +62,7 @@ void CaptureThread::run()
     }
 
     setFilter(adhandle, Global::filter);
+
     while (!isStopped)
     {
         struct pcap_pkthdr *header = NULL;
@@ -73,6 +75,5 @@ void CaptureThread::run()
     }
     // while stopped
     isStopped = false;
-    qDebug() << "emit CaptureStopped";
     return;
 }

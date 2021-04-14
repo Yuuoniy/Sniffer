@@ -63,9 +63,11 @@ void ProtocolProcess::processEtherPacket(const unsigned char *data)
     QByteArray DMac, SMac;
     DMac.setRawData((const char *)parseData.ether_header->dest, 6);
     SMac.setRawData((const char *)parseData.ether_header->src, 6);
+
+    // parseData.strDMac = parseData.strDMac + bytes2mac(DMac);
+    // parseData.strSMac = parseData.strSMac + bytes2mac(SMac);
     DMac = DMac.toHex().toUpper();
     SMac = SMac.toHex().toUpper();
-
     parseData.strDMac = parseData.strDMac + DMac[0] + DMac[1] + "-" + DMac[2] + DMac[3] + "-" + DMac[4] + DMac[5] + "-" + DMac[6] + DMac[7] + "-" + DMac[8] + DMac[9] + "-" + DMac[10] + DMac[11];
     parseData.strSMac = parseData.strSMac + SMac[0] + SMac[1] + "-" + SMac[2] + SMac[3] + "-" + SMac[4] + SMac[5] + "-" + SMac[6] + SMac[7] + "-" + SMac[8] + SMac[9] + "-" + SMac[10] + SMac[11];
 }
@@ -110,29 +112,6 @@ void ProtocolProcess::processIPPacket(const unsigned char *data)
 
     parseData.strSIP += szSaddr;
     parseData.strDIP += szDaddr;
-}
-
-QString ip6tos(ipv6_address &address)
-{
-    QString str = QString("%1%2:%3%4:%5%6:%7%8:%9%10:%11%12:%13%14:%15%16")
-                      .arg(address.byte1, 0, 16)
-                      .arg(address.byte2, 0, 16)
-                      .arg(address.byte3, 0, 16)
-                      .arg(address.byte4, 0, 16)
-                      .arg(address.byte5, 0, 16)
-                      .arg(address.byte6, 0, 16)
-                      .arg(address.byte7, 0, 16)
-                      .arg(address.byte8, 0, 16)
-                      .arg(address.byte9, 0, 16)
-                      .arg(address.byte10, 0, 16)
-                      .arg(address.byte11, 0, 16)
-                      .arg(address.byte12, 0, 16)
-                      .arg(address.byte13, 0, 16)
-                      .arg(address.byte14, 0, 16)
-                      .arg(address.byte15, 0, 16)
-                      .arg(address.byte16, 0, 16);
-
-    return str;
 }
 
 void ProtocolProcess::processIPv6Packet(const unsigned char *data)
