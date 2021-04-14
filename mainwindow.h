@@ -8,6 +8,7 @@
 #include <QVector>
 #include "packetslistview.h"
 #include "detailtreeview.h"
+#include "utils.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -23,9 +24,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void setConnect();
+    void showAllDevices();
 
 public slots:
-    void Helloworld();
     void startCapture();
     void stop();
     void addDataToWidget(const QItemSelection &nowSelect);

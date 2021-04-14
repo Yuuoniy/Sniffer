@@ -281,3 +281,5 @@ struct SnifferData
 #define PROTO_TYPE_TCP 6
 #define PROTO_TYPE_UDP 17
 #define PROTO_TYPE_ICMPv6 58
+
+

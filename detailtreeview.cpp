@@ -21,14 +21,6 @@ void DetailTreeView::ShowTreeAnalyseInfo(const SnifferData *snifferData)
     addAppInfo(snifferData);
 }
 
-enum Layers
-{
-    ethernet_layer,
-    network_layer,
-    trans_layer,
-    application_layer
-};
-
 void DetailTreeView::addEthernetInfo(const SnifferData *snifferData)
 {
     QStandardItem *item, *itemChild;
@@ -77,51 +69,6 @@ void DetailTreeView::addIPv6Info(const SnifferData *snifferData)
     detailModel->setItem(network_layer, item);
     item->appendRow(new QStandardItem(snifferData->protoInfo.strSIP));
     item->appendRow(new QStandardItem(snifferData->protoInfo.strDIP));
-}
-
-QString mactos(mac_address address)
-{
-    QString str = QString("%1:%2:%3:%4:%5:%6")
-                      .arg(address.byte1, 0, 16)
-                      .arg(address.byte2, 0, 16)
-                      .arg(address.byte3, 0, 16)
-                      .arg(address.byte4, 0, 16)
-                      .arg(address.byte5, 0, 16)
-                      .arg(address.byte6, 0, 16);
-    return str;
-}
-
-QString iptos(struct ip_address address)
-{
-    QString str = QString("%1.%2.%3.%4")
-                      .arg(address.byte1)
-                      .arg(address.byte2)
-                      .arg(address.byte3)
-                      .arg(address.byte4);
-    return str;
-}
-
-QString ip6tos(ipv6_address address)
-{
-    QString str = QString("%1%2:%3%4:%5%6:%7%8:%9%10:%11%12:%13%14:%15%16")
-                      .arg(address.byte1, 0, 16)
-                      .arg(address.byte2, 0, 16)
-                      .arg(address.byte3, 0, 16)
-                      .arg(address.byte4, 0, 16)
-                      .arg(address.byte5, 0, 16)
-                      .arg(address.byte6, 0, 16)
-                      .arg(address.byte7, 0, 16)
-                      .arg(address.byte8, 0, 16)
-                      .arg(address.byte9, 0, 16)
-                      .arg(address.byte10, 0, 16)
-                      .arg(address.byte11, 0, 16)
-                      .arg(address.byte12, 0, 16)
-                      .arg(address.byte13, 0, 16)
-                      .arg(address.byte14, 0, 16)
-                      .arg(address.byte15, 0, 16)
-                      .arg(address.byte16, 0, 16);
-
-    return str;
 }
 
 void DetailTreeView::addARPInfo(const SnifferData *snifferData)

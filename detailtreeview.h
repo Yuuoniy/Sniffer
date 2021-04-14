@@ -5,7 +5,7 @@
 #include <QString>
 #include <QRegularExpression>
 #include "protocol.h"
-
+#include "utils.h"
 class DetailTreeView
 {
 public:
